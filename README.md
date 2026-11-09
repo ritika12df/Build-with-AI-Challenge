@@ -48,6 +48,23 @@ TestPilot AI aims to simplify this process by allowing users to provide a websit
 
 ---
 
+## 🤖 AI-Assisted Development
+
+GitHub Copilot is used as an AI coding assistant during the development of TestPilot AI.
+
+It helps with:
+
+- Code suggestions and implementation assistance.
+
+- Understanding programming concepts and technologies.
+
+- Debugging and troubleshooting.
+
+- Improving code readability and structure.
+
+### Note:
+GitHub Copilot assists with development. Gemini AI is planned as part of TestPilot AI's own application functionality for test planning and failure analysis.
+
 ## 🏗️ Project Architecture
 
 The application is planned around three main components:
@@ -107,6 +124,14 @@ TestPilot-AI/
 - [x] Added the dashboard header.
 - [x] Created reusable statistics cards.
 - [x] Added the initial empty-state section.
+- [x] Created the website URL input section.
+- [x] Added frontend URL validation.
+- [x] Added the Start Testing button.
+- [x] Created the backend website preparation endpoint.
+- [x] Connected React frontend with FastAPI using Axios.
+- [x] Added loading, success, and error states.
+- [x] Configured CORS for GitHub Codespaces.
+- [x] Verified frontend-backend communication.
 
 ### Upcoming Milestones
 
@@ -118,7 +143,6 @@ TestPilot-AI/
 - [ ] Implement bug reports and screenshot evidence.
 - [ ] Add SQLite-based test history.
 - [ ] Improve the interface and prepare the application for deployment.
-
 ---
 
 ## 💻 Local Setup
