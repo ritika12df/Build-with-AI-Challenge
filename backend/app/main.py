@@ -1,7 +1,9 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 app = FastAPI(
     title="TestPilot AI",
@@ -9,16 +11,24 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow our React frontend to communicate with FastAPI
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://expert-xylophone-555jq96qgjpcv6v5-5173.app.github.dev"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Request model
+class WebsiteRequest(BaseModel):
+    url: str
 
+
+# Home endpoint
 @app.get("/")
 async def home():
     return {
@@ -27,6 +37,7 @@ async def home():
     }
 
 
+# Health-check endpoint
 @app.get("/api/health")
 async def health_check():
     return {
@@ -35,3 +46,34 @@ async def health_check():
         "status": "healthy",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+
+# Prepare website testing endpoint
+@app.post("/api/tests/prepare")
+async def prepare_test(request: WebsiteRequest):
+
+    website_url = request.url.strip()
+
+    try:
+        parsed_url = urlparse(website_url)
+
+        if (
+            parsed_url.scheme not in ["http", "https"]
+            or not parsed_url.hostname
+            or not parsed_url.hostname.strip()
+        ):
+            raise ValueError("Invalid URL")
+
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="Please provide a valid HTTP or HTTPS website URL."
+        )
+
+    return {
+        "success": True,
+        "url": website_url,
+        "message": "Website URL received and validated successfully!",
+        "status": "ready_for_testing"
+    }
+
