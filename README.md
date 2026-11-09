@@ -157,8 +157,8 @@ TestPilot-AI/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/TestPilot-AI.git
-cd TestPilot-AI
+git clone https://github.com/ritika12df/Build-with-AI-Challenge.git
+cd Build-with-AI-Challenge
 ```
 
 ### 2. Set up the frontend
