@@ -410,3 +410,264 @@
   }
 }
 
+
+/* Website Explorer */
+
+.explorer-section {
+  margin-top: 28px;
+  padding: 24px;
+  background: #171923;
+  border: 1px solid #292d3a;
+  border-radius: 14px;
+  color: #f4f4f5;
+}
+
+.explorer-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.explorer-heading h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.explorer-heading p {
+  margin: 0;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.explorer-heading > svg {
+  color: #8b7cff;
+}
+
+.explorer-input-area {
+  display: flex;
+  gap: 12px;
+}
+
+.explorer-input-area input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #383c4a;
+  border-radius: 8px;
+  background: #202330;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.explorer-input-area input:focus {
+  border-color: #8b7cff;
+}
+
+.explore-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #7563e8;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.explore-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin-icon {
+  animation: explorer-spin 1s linear infinite;
+}
+
+@keyframes explorer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.explorer-error,
+.explorer-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-top: 18px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.explorer-error {
+  background: #3b2025;
+  color: #ff9b9b;
+}
+
+.explorer-success {
+  background: #173529;
+  color: #8be0ad;
+}
+
+.explorer-results {
+  margin-top: 22px;
+}
+
+.explorer-page-info {
+  margin-top: 20px;
+  padding: 18px;
+  background: #202330;
+  border-radius: 10px;
+}
+
+.explorer-page-info h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+
+.explorer-page-info a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  color: #a99cff;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.status-code {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #173529;
+  color: #8be0ad;
+  font-size: 12px;
+}
+
+.explorer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.explorer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px;
+  background: #202330;
+  border: 1px solid #303443;
+  border-radius: 10px;
+}
+
+.explorer-stat svg {
+  color: #a99cff;
+}
+
+.explorer-stat strong {
+  font-size: 24px;
+}
+
+.explorer-stat span {
+  color: #a1a1aa;
+  font-size: 13px;
+}
+
+.explorer-detail-section {
+  margin-top: 24px;
+}
+
+.explorer-detail-section h3 {
+  margin-bottom: 14px;
+  font-size: 16px;
+}
+
+.explorer-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.explorer-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #303443;
+  font-size: 13px;
+}
+
+.explorer-list li > span:first-child {
+  overflow-wrap: anywhere;
+}
+
+.explorer-list a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  color: #a99cff;
+  text-decoration: none;
+}
+
+.element-type {
+  color: #a1a1aa;
+  font-size: 12px;
+}
+
+.explorer-empty {
+  color: #a1a1aa;
+  font-size: 13px;
+}
+
+.explorer-form {
+  margin-bottom: 14px;
+  padding: 14px;
+  background: #202330;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.explorer-form p {
+  font-size: 13px;
+  color: #c4c4ce;
+}
+
+.explorer-field {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #303443;
+  font-size: 12px;
+}
+
+.explorer-field span:last-child {
+  color: #a99cff;
+}
+
+@media (max-width: 600px) {
+  .explorer-input-area {
+    flex-direction: column;
+  }
+
+  .explorer-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .explorer-list li {
+    align-items: flex-start;
+  }
+}
+
+
