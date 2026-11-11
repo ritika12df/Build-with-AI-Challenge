@@ -12,6 +12,9 @@ import {
   FileText,
   ExternalLink
 } from "lucide-react";
+import TestResults from "./TestResults";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface WebsiteLink {
   text: string;
@@ -56,7 +59,73 @@ function WebsiteTester() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [result, setResult] = useState<ExploreResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [aiScenarios, setAiScenarios] = useState("");
+  const [generatingAI, setGeneratingAI] = useState(false);
   const [error, setError] = useState("");
+  const [testResults, setTestResults] = useState<{
+  total_tests: number;
+  passed: number;
+  failed: number;
+  results: {
+    name: string;
+    status: "passed" | "failed";
+    message: string;
+  }[];
+} | null>(null);
+
+const [testing, setTesting] = useState(false);
+
+const handleRunTests = async () => {
+  setError("");
+  setTestResults(null);
+  setTesting(true);
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "")}/api/tests/run`,
+      { url: websiteUrl.trim() }
+    );
+
+    setTestResults(response.data);
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      setError(
+        err.response?.data?.detail ||
+        "Unable to run automated tests."
+      );
+    } else {
+      setError("Something went wrong while running tests.");
+    }
+  } finally {
+    setTesting(false);
+  }
+};
+
+const handleGenerateScenarios = async () => {
+  setError("");
+  setAiScenarios("");
+  setGeneratingAI(true);
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "")}/api/ai/generate-scenarios`,
+      { url: websiteUrl.trim() }
+    );
+
+    setAiScenarios(response.data.scenarios);
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      setError(
+        err.response?.data?.detail ||
+        "Unable to generate AI test scenarios."
+      );
+    } else {
+      setError("Something went wrong while generating scenarios.");
+    }
+  } finally {
+    setGeneratingAI(false);
+  }
+};
 
   const handleExplore = async () => {
     setError("");
@@ -108,6 +177,14 @@ function WebsiteTester() {
 
   return (
     <section className="explorer-section">
+      {testResults && (
+  <TestResults
+    results={testResults.results}
+    totalTests={testResults.total_tests}
+    passed={testResults.passed}
+    failed={testResults.failed}
+  />
+)}
       <div className="explorer-heading">
         <div>
           <h2>Website Explorer</h2>
@@ -124,6 +201,22 @@ function WebsiteTester() {
           placeholder="https://example.com"
           disabled={loading}
         />
+
+        <button
+  onClick={handleRunTests}
+  disabled={testing || loading || !result}
+  className="run-tests-button"
+>
+  {testing ? "Running Tests..." : "Run Automated Tests"}
+</button>
+
+<button
+  onClick={handleGenerateScenarios}
+  disabled={generatingAI || loading || testing || !result}
+  className="ai-scenarios-button"
+>
+  {generatingAI ? "Generating Scenarios..." : "Generate AI Test Scenarios"}
+</button>
 
         <button
           onClick={handleExplore}
@@ -267,6 +360,17 @@ function WebsiteTester() {
           </div>
         </div>
       )}
+      {aiScenarios && (
+  <div className="ai-scenarios">
+    <h2>Gemini AI Test Scenarios</h2>
+
+    <div className="ai-scenarios-content">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {aiScenarios}
+      </ReactMarkdown>
+    </div>
+  </div>
+)}
     </section>
   );
 }
