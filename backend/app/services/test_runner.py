@@ -1,4 +1,7 @@
 
+from pathlib import Path
+from uuid import uuid4
+
 from playwright.async_api import (
     async_playwright,
     TimeoutError as PlaywrightTimeoutError
@@ -7,20 +10,27 @@ from playwright.async_api import (
 
 async def run_basic_tests(url: str):
     """
-    Run basic automated website checks using Playwright.
+    Run basic automated website checks using Playwright
+    and capture a screenshot of the website.
     """
 
     test_results = []
+    screenshot_path = None
+    response = None
+
+    # Create screenshots directory
+    screenshot_dir = (
+        Path(__file__).resolve().parents[2] / "screenshots"
+    )
+    screenshot_dir.mkdir(parents=True, exist_ok=True)
 
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(
-            headless=True
-        )
+        browser = await playwright.chromium.launch(headless=True)
 
         try:
             page = await browser.new_page()
 
-            # Test 1: Website loading
+            # Test 1: Website Loading
             try:
                 response = await page.goto(
                     url,
@@ -52,13 +62,27 @@ async def run_basic_tests(url: str):
                     "message": str(error)
                 })
 
+            # Capture screenshot if navigation succeeded
+            if page.url != "about:blank":
+                try:
+                    screenshot_filename = f"{uuid4().hex}.png"
+                    screenshot_file = screenshot_dir / screenshot_filename
+
+                    await page.screenshot(
+                        path=str(screenshot_file),
+                        full_page=True
+                    )
+
+                    screenshot_path = (
+                        f"/screenshots/{screenshot_filename}"
+                    )
+
+                except Exception as error:
+                    print(f"Screenshot capture failed: {error}")
+
             # Test 2: HTTP Status
             if page.url != "about:blank":
-                status_code = (
-                    response.status
-                    if "response" in locals() and response
-                    else None
-                )
+                status_code = response.status if response else None
 
                 test_results.append({
                     "name": "HTTP Status Check",
@@ -81,9 +105,7 @@ async def run_basic_tests(url: str):
 
                 test_results.append({
                     "name": "Page Title Check",
-                    "status": (
-                        "passed" if title.strip() else "failed"
-                    ),
+                    "status": "passed" if title.strip() else "failed",
                     "message": (
                         f"Page title: {title}"
                         if title.strip()
@@ -107,9 +129,7 @@ async def run_basic_tests(url: str):
                 test_results.append({
                     "name": "Page Content Check",
                     "status": (
-                        "passed"
-                        if body_content.strip()
-                        else "failed"
+                        "passed" if body_content.strip() else "failed"
                     ),
                     "message": (
                         "Page contains visible text content."
@@ -141,8 +161,10 @@ async def run_basic_tests(url: str):
                 "total_tests": len(test_results),
                 "passed": passed,
                 "failed": failed,
-                "results": test_results
+                "results": test_results,
+                "screenshot": screenshot_path
             }
 
         finally:
             await browser.close()
+

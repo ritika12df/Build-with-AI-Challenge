@@ -11,12 +11,25 @@ from app.services.gemini_service import (
     generate_test_scenarios
 )
 from urllib.parse import urlparse
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI(
     title="TestPilot AI",
     description="Autonomous Website Testing Agent API",
     version="1.0.0"
+)
+
+# Serve captured screenshots
+SCREENSHOT_DIR = Path(__file__).resolve().parents[1] / "screenshots"
+
+SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
+
+app.mount(
+    "/screenshots",
+    StaticFiles(directory=str(SCREENSHOT_DIR)),
+    name="screenshots"
 )
 
 
