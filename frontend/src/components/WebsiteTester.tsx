@@ -15,6 +15,7 @@ import {
 import TestResults from "./TestResults";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import BugReports from "./BugReports";
 
 interface WebsiteLink {
   text: string;
@@ -55,6 +56,18 @@ interface ExploreResult {
   message: string;
 }
 
+interface BugReportData {
+  website_url: string;
+  generated_at: string;
+  total_bugs: number;
+  bugs: {
+    title: string;
+    description: string;
+    severity: string;
+    status: string;
+  }[];
+}
+
 function WebsiteTester() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [result, setResult] = useState<ExploreResult | null>(null);
@@ -62,6 +75,8 @@ function WebsiteTester() {
   const [aiScenarios, setAiScenarios] = useState("");
   const [generatingAI, setGeneratingAI] = useState(false);
   const [error, setError] = useState("");
+  const [bugReport, setBugReport] = useState<BugReportData | null>(null);
+const [generatingReport, setGeneratingReport] = useState(false);
   const [testResults, setTestResults] = useState<{
   total_tests: number;
   passed: number;
@@ -75,6 +90,7 @@ function WebsiteTester() {
 
 const [testing, setTesting] = useState(false);
 
+
 const handleRunTests = async () => {
   setError("");
   setTestResults(null);
@@ -87,6 +103,7 @@ const handleRunTests = async () => {
     );
 
     setTestResults(response.data);
+
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       setError(
@@ -98,6 +115,34 @@ const handleRunTests = async () => {
     }
   } finally {
     setTesting(false);
+  }
+};
+
+
+const handleGenerateBugReport = async () => {
+  setError("");
+  setBugReport(null);
+  setGeneratingReport(true);
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "")}/api/reports/bugs`,
+      { url: websiteUrl.trim() }
+    );
+
+    setBugReport(response.data.report);
+
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      setError(
+        err.response?.data?.detail ||
+        "Unable to generate bug report."
+      );
+    } else {
+      setError("Something went wrong while generating the bug report.");
+    }
+  } finally {
+    setGeneratingReport(false);
   }
 };
 
@@ -185,6 +230,15 @@ const handleGenerateScenarios = async () => {
     failed={testResults.failed}
   />
 )}
+
+{bugReport && (
+  <BugReports
+    websiteUrl={bugReport.website_url}
+    generatedAt={bugReport.generated_at}
+    totalBugs={bugReport.total_bugs}
+    bugs={bugReport.bugs}
+  />
+)}
       <div className="explorer-heading">
         <div>
           <h2>Website Explorer</h2>
@@ -209,6 +263,17 @@ const handleGenerateScenarios = async () => {
 >
   {testing ? "Running Tests..." : "Run Automated Tests"}
 </button>
+
+<button
+  onClick={handleGenerateBugReport}
+  disabled={generatingReport || loading || testing || !result}
+  className="bug-report-button"
+>
+  {generatingReport
+    ? "Generating Bug Report..."
+    : "Generate Bug Report"}
+</button>
+
 
 <button
   onClick={handleGenerateScenarios}

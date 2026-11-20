@@ -13,6 +13,7 @@ from app.services.gemini_service import (
 from urllib.parse import urlparse
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from app.services.bug_report import generate_bug_report
 
 
 app = FastAPI(
@@ -202,5 +203,26 @@ async def generate_scenarios(request: WebsiteRequest):
             status_code=500,
             detail=str(error)
         )
+
+@app.post("/api/reports/bugs")
+async def create_bug_report(request: WebsiteRequest):
+    try:
+        # Run automated website tests
+        test_data = await run_basic_tests(request.url)
+
+        # Generate bug report from test results
+        report = generate_bug_report(test_data)
+
+        return {
+            "success": True,
+            "message": "Bug report generated successfully!",
+            "report": report
+        }
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )        
 
 

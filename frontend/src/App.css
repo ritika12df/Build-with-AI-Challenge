@@ -861,3 +861,108 @@
   padding: 10px;
   text-align: left;
 }
+
+
+.bug-report-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #d97757;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.bug-report-button:hover {
+  opacity: 0.85;
+}
+
+.bug-report-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bug-reports {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #171717;
+}
+
+.bug-reports-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.bug-reports-heading h2 {
+  margin: 0 0 6px;
+}
+
+.bug-reports-heading p {
+  margin: 0;
+  color: #aaa;
+}
+
+.bug-report-summary {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.bug-report-summary strong {
+  font-size: 28px;
+}
+
+.bug-report-summary span,
+.bug-report-meta {
+  color: #aaa;
+}
+
+.bug-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  margin-top: 12px;
+  border: 1px solid #444;
+  border-radius: 8px;
+}
+
+.bug-item-content {
+  flex: 1;
+}
+
+.bug-item-content h3 {
+  margin: 0 0 8px;
+}
+
+.bug-item-content p {
+  color: #bbb;
+}
+
+.bug-item-labels {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.bug-item-labels span {
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: #333;
+}
+
+.no-bugs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #55d69e;
+}
