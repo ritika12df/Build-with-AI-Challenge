@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Globe,
@@ -16,6 +15,7 @@ import TestResults from "./TestResults";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import BugReports from "./BugReports";
+import TestHistory from "./TestHistory";
 
 interface WebsiteLink {
   text: string;
@@ -68,6 +68,21 @@ interface BugReportData {
   }[];
 }
 
+interface TestRun {
+  id: number;
+  website_url: string;
+  created_at: string;
+  total_tests: number;
+  passed: number;
+  failed: number;
+  screenshot_path: string | null;
+  results: {
+    name: string;
+    status: "passed" | "failed";
+    message: string;
+  }[];
+}
+
 function WebsiteTester() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [result, setResult] = useState<ExploreResult | null>(null);
@@ -89,6 +104,31 @@ const [generatingReport, setGeneratingReport] = useState(false);
 } | null>(null);
 
 const [testing, setTesting] = useState(false);
+const [testHistory, setTestHistory] = useState<TestRun[]>([]);
+const [loadingHistory, setLoadingHistory] = useState(false);
+
+const fetchTestHistory = async () => {
+  setLoadingHistory(true);
+
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "")}/api/tests/history`
+    );
+
+    setTestHistory(response.data.history);
+
+  } catch (err) {
+    console.error("Unable to fetch test history:", err);
+    setError("Unable to load test history.");
+
+  } finally {
+    setLoadingHistory(false);
+  }
+};
+
+useEffect(() => {
+  fetchTestHistory();
+}, []);
 
 
 const handleRunTests = async () => {
@@ -103,6 +143,7 @@ const handleRunTests = async () => {
     );
 
     setTestResults(response.data);
+    await fetchTestHistory();
 
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
@@ -239,6 +280,12 @@ const handleGenerateScenarios = async () => {
     bugs={bugReport.bugs}
   />
 )}
+
+<TestHistory
+  history={testHistory}
+  loading={loadingHistory}
+  onRefresh={fetchTestHistory}
+/>
       <div className="explorer-heading">
         <div>
           <h2>Website Explorer</h2>

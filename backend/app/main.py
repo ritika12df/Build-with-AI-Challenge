@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, timezone
@@ -14,6 +14,11 @@ from urllib.parse import urlparse
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from app.services.bug_report import generate_bug_report
+from app.database import (
+    initialize_database,
+    save_test_run,
+    get_test_history
+)
 
 
 app = FastAPI(
@@ -21,6 +26,10 @@ app = FastAPI(
     description="Autonomous Website Testing Agent API",
     version="1.0.0"
 )
+
+@app.on_event("startup")
+async def startup_event():
+    initialize_database()
 
 # Serve captured screenshots
 SCREENSHOT_DIR = Path(__file__).resolve().parents[1] / "screenshots"
@@ -150,9 +159,17 @@ async def run_website_tests(request: WebsiteRequest):
                 detail="Please provide a valid HTTP or HTTPS URL."
             )
 
+        # Run automated website tests
         results = await run_basic_tests(website_url)
 
-        return results
+        # Save the test results in SQLite
+        test_run_id = save_test_run(results)
+
+        return {
+            **results,
+            "test_run_id": test_run_id,
+            "message": "Test results saved successfully!"
+        }
 
     except HTTPException:
         raise
@@ -161,7 +178,7 @@ async def run_website_tests(request: WebsiteRequest):
         raise HTTPException(
             status_code=500,
             detail=str(error)
-        )       
+        )
 
 @app.post("/api/ai/test")
 async def test_gemini(request: AIRequest):
@@ -223,6 +240,26 @@ async def create_bug_report(request: WebsiteRequest):
         raise HTTPException(
             status_code=500,
             detail=str(error)
-        )        
+        )     
+  
+@app.get("/api/tests/history")
+async def get_test_history_endpoint(
+    limit: int = Query(default=20, ge=1, le=100)
+):
+    try:
+        history = get_test_history(limit)
+
+        return {
+            "success": True,
+            "total_runs": len(history),
+            "history": history
+        }
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )
+         
 
 
